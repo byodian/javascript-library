@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOM 操作库</title>
+  <style>
+
+    body {
+      margin: 0;
+    }
+
+    .header--fixed {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+    .headroom {
+      will-change: transform;
+      transition: transform 200ms linear;
+    }
+    .headroom--pinned {
+      transform: translateY(0%);
+    }
+    .headroom--unpinned {
+      transform: translateY(-100%);
+    }
+
+    main, header, footer {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    main {
+      margin-top: 60px;
+    }
+
+    header {
+      background-color: pink;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+  <header class="headroom--pinned header--fixed">
+    good
+  </header>
+  <main>
+    main
+  </main>
+  <footer>footer</footer>
+  <script src="../js/main.js"></script>
+</body>
+</html>
