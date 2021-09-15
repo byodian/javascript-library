@@ -7,7 +7,7 @@ const settings = {
 }
 
 const paths = {
-  input: ['src/','public/'],
+  input: ['src/**/*.js','public/'],
   output: 'dist/',
   scripts: {
     input: 'src/js/**/*.js',

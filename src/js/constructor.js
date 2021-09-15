@@ -50,7 +50,11 @@ let Greeting = (function () {
     hiBefore: 'Heyo',
     hiAfter: '',
     byeBefore: 'See ya later',
-    byeAfter: 'Take it easy.'
+    byeAfter: 'Take it easy.',
+
+    // callbacks
+    onHi: function () {},
+    onBye: function () {}
   }
 
   const Constructor = function(name, options = {}) {
@@ -69,6 +73,8 @@ let Greeting = (function () {
       'color: pink;font-size: 25px', 
       `${this._settings.hiBefore} ${this._name} ${this._settings.hiAfter}`
     )
+
+    this._settings.onHi(this._name, this._settings.hiBefore, this._settings.hiAfter)
     return this
   }
 
@@ -79,6 +85,7 @@ let Greeting = (function () {
       `${this._settings.byeBefore} ${this._name} ${this._settings.byeAfter}`
     )
     
+    this._settings.onBye(this._name, this._settings.byeBefore, this._settings.byeAfter);
     return this
   }
 
@@ -86,11 +93,19 @@ let Greeting = (function () {
 })()
 
 const merlin = new Greeting('Merlin', {
-  hiAfter: '.'
+  hiAfter: '.',
+  onBye: function(name) {
+    const app = document.querySelector('.bye-text')
+    app.textContent = `👋 ${name}`;
+  }
 });
 
-console.log(merlin.name)
-console.log(merlin.settings)
+// console.log(merlin.name)
+// console.log(merlin.settings)
 
-merlin.sayHi().sayBye();
-window.Greeting = Greeting
+let form = document.querySelector('form');
+form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    form.reset();
+    merlin.sayBye();
+});
