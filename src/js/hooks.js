@@ -14,3 +14,10 @@
 
 
 // * Custom Events
+// Instead of padding in a callback function, you can
+// alternatively emit a custom event that developers 
+// can listen for with the `Element.addEventListener()` method.
+
+// The `CustomEvent()` object provides a way to create and emit
+// custom events, as well as pass in custom event details.
+
