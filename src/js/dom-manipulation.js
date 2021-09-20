@@ -11,39 +11,39 @@
 * 5. Destroying the instantiation
  */
 
-const egg = (function() {
-  // Get the element
-  const init =  function() {
-    let elem = document.querySelector('#egg');
-    let scaled = false;
+(function() {
+	// Get the element
+	const init =  function() {
+		let elem = document.querySelector('#egg');
+		let scaled = false;
   
-    // Create button
-    let btn = document.createElement('button');
-    btn.innerHTML = '🥚';
-    btn.setAttribute('aria-label', `click me`);
-    btn.style.transition = 'transform 300ms ease-in';
+		// Create button
+		let btn = document.createElement('button');
+		btn.innerHTML = '🥚';
+		btn.setAttribute('aria-label', 'click me');
+		btn.style.transition = 'transform 300ms ease-in';
   
-    // Inject into the DOM
-    elem.append(btn);
+		// Inject into the DOM
+		elem.append(btn);
   
-    /**
+		/**
      * Handle click events
      */
-    function toggle () {
-      // If the button is scaled, shrink it
-      // Otherwise, grow it
-      btn.style.transform = scaled ? '' : 'scale(2)';
+		function toggle () {
+			// If the button is scaled, shrink it
+			// Otherwise, grow it
+			btn.style.transform = scaled ? '' : 'scale(2)';
   
-      // Flip the scaled state
-      scaled = !scaled;
-    }
+			// Flip the scaled state
+			scaled = !scaled;
+		}
   
-    // Listen for clicks on the button
-    btn.addEventListener('click', toggle);
-  }
+		// Listen for clicks on the button
+		btn.addEventListener('click', toggle);
+	};
   
-  return { init }
-})()
+	return { init };
+})();
 
 // egg.init()
 
@@ -67,92 +67,92 @@ const egg = (function() {
 
 let Egg = (function () {
 
-  const defaults = {
-    label: 'click me',
-    btnText: '🥚',
-    transition: 'transform 300ms ease-in',
-    scale: '2'
-  }
+	const defaults = {
+		label: 'click me',
+		btnText: '🥚',
+		transition: 'transform 300ms ease-in',
+		scale: '2'
+	};
 
-  function createBtn (elem, settings) {
-    let btn = document.createElement('button');
-    btn.innerHTML = settings.btnText;
+	function createBtn (elem, settings) {
+		let btn = document.createElement('button');
+		btn.innerHTML = settings.btnText;
 
-    if (settings.label) {
-      btn.setAttribute('aria-label', settings.label);
-    }
-    if (settings.transition) {
-      btn.style.transition = settings.transition;
-    }
+		if (settings.label) {
+			btn.setAttribute('aria-label', settings.label);
+		}
+		if (settings.transition) {
+			btn.style.transition = settings.transition;
+		}
 
-    elem.append(btn);
+		elem.append(btn);
 
-    return btn
-  }
+		return btn;
+	}
 
-  function toggleBtn (instance) {
-    // If the button is scaled, shrink it
-    // Otherwise, grow it
-    instance._btn.style.transform = instance._scaled ? '' : `scale(${instance._settings.scale})`;
+	function toggleBtn (instance) {
+		// If the button is scaled, shrink it
+		// Otherwise, grow it
+		instance._btn.style.transform = instance._scaled ? '' : `scale(${instance._settings.scale})`;
 
-    // Flip the scaled state
-    instance._scaled = !instance._scaled;
-  }
+		// Flip the scaled state
+		instance._scaled = !instance._scaled;
+	}
 
-  function createEventListener(btn, instance) {
-    function toggle() {
-      toggleBtn(instance)
-    }
-    btn.addEventListener('click', toggle)
+	function createEventListener(btn, instance) {
+		function toggle() {
+			toggleBtn(instance);
+		}
+		btn.addEventListener('click', toggle);
 
-    return toggle
-  }
+		return toggle;
+	}
 
-  function Constructor (selector, options = {}) {
-    const elem = document.querySelector(selector);
+	function Constructor (selector, options = {}) {
+		const elem = document.querySelector(selector);
 
-    const settings = Object.assign({}, defaults, options);
-    Object.freeze(settings);
+		const settings = Object.assign({}, defaults, options);
+		Object.freeze(settings);
 
-    const btn = createBtn(elem, settings);
+		const btn = createBtn(elem, settings);
     
-    // Create the event listener
-    const listener = createEventListener(btn, this)
+		// Create the event listener
+		const listener = createEventListener(btn, this);
 
-    Object.defineProperties(this, {
-      _elem: { value: elem },
-      _settings: {value: settings},
-      _btn: { value: btn},
-      _listener: { value: listener },
-      _scaled: { value: false, writable: true }
-    })
-  }
+		Object.defineProperties(this, {
+			_elem: { value: elem },
+			_settings: {value: settings},
+			_btn: { value: btn},
+			_listener: { value: listener },
+			_scaled: { value: false, writable: true }
+		});
+	}
 
-  Constructor.prototype.toggle = function () {  
-    toggleBtn(this)
-  }
+	Constructor.prototype.toggle = function () {  
+		toggleBtn(this);
+	};
 
-  /**
+	/**
    * Destroy this instance
    */
 
-  Constructor.prototype.destroy = function () {
-    // Remove the event listener immediately
-    this._btn.removeEventListener('click', this._listener);
+	Constructor.prototype.destroy = function () {
+		// Remove the event listener immediately
+		this._btn.removeEventListener('click', this._listener);
 
-    // Remove the button
-    this._btn.remove();
-  };
+		// Remove the button
+		this._btn.remove();
+	};
 
-  return Constructor
-})()
+	return Constructor;
+})();
 
-const egg1 = new Egg('#egg')
-egg1.toggle()
+const egg1 = new Egg('#egg');
+egg1.toggle();
 const party = new Egg('#party', {
-  btnText: '🎉',
-  label: `It's party time`,
-  scale: '3'
-})
+	btnText: '🎉',
+	label: 'It\'s party time',
+	scale: '3'
+});
 
-party.destroy()
+party.destroy();
