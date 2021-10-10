@@ -1,17 +1,4 @@
-export function emitEvent(type, detail = {}, elem = document) {
-	// Make sure there's an event type
-	if (!type) return
-
-	// Create a new event
-	const customEvent = new CustomEvent(type, {
-		bubbles: true,
-		cancelable: true,
-		detail: detail
-	})
-
-	// Dispatch the event
-	return elem.dispatchEvent(customEvent)
-}
+import emitEvent from './utils/emitEvent';
 
 let greetings = (function () {
 	let settings = {
@@ -72,21 +59,6 @@ let Greeting = (function () {
 		onBye: function () {}
 	}
 
-	function emitEvent(type, detail = {}, elem = document) {
-		// Make sure there's an event type
-		if (!type) return
-  
-		// Create a new event
-		const customEvent = new CustomEvent(type, {
-			bubbles: true,
-			cancelable: true,
-			detail: detail
-		})
-  
-		// Dispatch the event
-		return elem.dispatchEvent(customEvent)
-	}
-
 	const Constructor = function(name, options = {}) {
 		const settings = Object.assign({}, defaults, options)
 
@@ -97,6 +69,7 @@ let Greeting = (function () {
 			_settings: { value: settings }
 		})
 	} 
+
 	Constructor.prototype.sayHi = function () {
 		// Emit custom event
 		const canceled = !emitEvent('greeting:before-hi', {

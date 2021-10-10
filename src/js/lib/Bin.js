@@ -1,3 +1,5 @@
+import emitEvent from './utils/emitEvent'
+
 export const Bin = (function () {
   const defaults = {
     type: 'localstorage'
