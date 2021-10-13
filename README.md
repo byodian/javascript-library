@@ -10,7 +10,60 @@
 
 ```js
 // 入口文件 main.js
+import Vue from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
 
+Vue.config.productionTip = false
+
+import 'src/styles/index.scss'
+import 'src/components/form-generator/DynamicForm/styles/index.scss'
+
+// 插件
+import 'src/plugins'
+import 'src/plugins/flexible'
+
+import FormControls from 'src/components/form-generator/FormControls'
+import { addSpaceData, editSpaceData } from "src/api/common"
+
+// 全局资源
+import 'src/components'
+import 'src/directives'
+import * as filters from './filters'
+import 'src/icons'
+import 'src/components/form-generator/DynamicForm/icons'
+
+import './permission'
+
+// 插件库
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+
+import Swiper, { Navigation, Autoplay, Thumbs } from 'swiper' 
+import 'swiper/swiper-bundle.css'
+
+import contentmenu from 'v-contextmenu'
+import 'v-contextmenu/dist/index.css'
+
+import * as echarts from 'echarts'
+import { echartsTheme } from 'src/assets/json/echart-theme'
+
+Vue.prototype.$addSpaceData = addSpaceData
+Vue.prototype.$editSpaceData = editSpaceData
+Vue.prototype.$echarts = echarts
+Vue.prototype.$echarts.registerTheme('zlplw', echartsTheme)
+
+Swiper.use([Navigation, Autoplay, Thumbs])
+Vue.use(contentmenu)
+Vue.use(FormControls)
+Vue.use(ElementUI, { size: 'small' })
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+
+new Vue({ /*...*/ })
 ```
 
 ## 插件分类
@@ -105,16 +158,60 @@ new Vue({
 })
 ```
 
-## 问题一
+## 问题
+
+根据以上内容我们提出下面三个问题：
 
 1. 为什么 Vue 插件既可以是对象也可以是函数？
-2. Vue.use(plugin, options) 中的第二个参数的作用是什么？
+2. `Vue.use(plugin, options)` 参数 options 是如何传递给插件的第二个参数的
+3. 写一个插件需要什么
 
 ## Vue.use 实现原理
 
+```js
+import { toArray } from '../util/index'
+
+function initUse (Vue) {
+  // * Vue 构造器静态方法
+  Vue.use = function (plugin) {
+    // this._installedPlugins = this._installedPlugins || []
+    // const installPlugin = this._installedPlugins
+    const installPlugins = this._installedPlugins || (this._installedPlugins = []);
+
+    // * 确保插件只会被安装一次
+    if (installPlugins.indexOf(plugin) > -1) {
+      return this;
+    }
+
+    // * Vue.use(plugin, options)
+    // arguments <Arguments> => [plugin, options]
+    // args <Array> => [options]
+    const args = toArray(arguments, 1);
+    console.log('arguments:', arguments);
+    console.log('args:', args);
+
+    // * args <Array> => [Vue, options]
+    args.unshift(this);
+    console.log('执行 args.unshift(this) 之后, args:', args);
+
+    // * 1. plugin 作为对象且有 install 方法，调用 install 方法
+    // * 2. plugin 作为函数，直接调用该函数
+    if (typeof plugin.install === "function") {
+      plugin.install.apply(plugin, args);
+    } else if (typeof plugin === "function") {
+      plugin.apply(null, args);
+    }
+
+    // * 缓存已经安装的插件
+    installPlugins.push(plugin);
+    return this;
+  };
+}
+```
+
 ## Vue 3.0 插件的使用
 
-｜ 我们定义的应用只是通过 `new Vue()` 创建的根 Vue 实例。从同一个 Vue 构造函数创建的每个根实例**共享相同的全局配置**。
+> 我们定义的应用只是通过 `new Vue()` 创建的根 Vue 实例。从同一个 Vue 构造函数创建的每个根实例**共享相同的全局配置**。
 
 ```js
 // 这会影响到所有根实例
