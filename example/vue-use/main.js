@@ -6,7 +6,6 @@ initUse(Vue);
 const pluginAsObject = {
   install: function (Vue, options = {}) {
     Vue.prototype.$sayHi = function () {
-      console.log("Hello World");
       console.log('可选参数', options);
     };
   }
@@ -21,4 +20,9 @@ const pluginAsFunc = function (Vue) {
 };
 
 Vue.use(pluginAsFunc);
-console.log('Vue:', Vue)
+console.dir(Vue)
+
+const vm = new Vue();
+
+vm.$sayHi();
+vm.$sayBye();
