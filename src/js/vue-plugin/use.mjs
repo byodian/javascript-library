@@ -18,7 +18,6 @@ export default function initUse (Vue) {
     }
 
     const args = toArray(arguments, 1);
-
     args.unshift(this);
 
     if (typeof plugin.install === "function") {

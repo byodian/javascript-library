@@ -4,39 +4,36 @@
 // https://github.com/bencodezen/vue-enterprise-boilerplate/blob/main/src/components/_globals.js
 
 function install (Vue) {
-// https://webpack.js.org/guides/dependency-management/#require-context
-// https://webpack.docschina.org/guides/dependency-management/
-// requireComponent <Function> => webpackContext
+  // https://webpack.js.org/guides/dependency-management/#require-context
+  // https://webpack.docschina.org/guides/dependency-management/
+  // https://regex101.com/
+
   const requireComponent = require.context(
-  // Look for files in the current directory
+    // 在 src/components 文件夹中查找文件
     '@/components',
-    // Do not look in subdirectories
+    // 不查询其子目录
     false,
-    // Only include "App|Base-" prefixed .vue|js files
+    // 仅仅包括 "Base" 开头的 .vue|js 文件
     /(Base)\w+\.(vue|js)$/
   )
-  console.log(requireComponent)
 
-  console.log(requireComponent.keys())
-
-  // For each matching file name...
   requireComponent.keys().forEach((fileName) => {
-  // Get the component config
+    // 获取组件配置选项对象
     const componentConfig = requireComponent(fileName)
-    // Get the PascalCase version of the component name
+    // console.log(componentConfig)
+
+    // 获取驼峰版本的组件名称
+    // './BaseButton.vue' => 'BaseButton'
     const componentName = fileName
-    // Remove the "./_" from the beginning
+      // 移除开头的 "./"
       .replace(/^\.\//, '')
-    // Remove the file extension from the end
+      // 移除文件扩展名
       .replace(/\.\w+$/, '')
-    // Split up kebabs
       .split('-')
-    // Upper case
       .map((kebab) => kebab.charAt(0).toUpperCase() + kebab.slice(1))
-    // Concatenated
       .join('')
 
-    // Globally register the component
+    // 全局注册
     Vue.component(componentName, componentConfig.default || componentConfig)
   })
 }

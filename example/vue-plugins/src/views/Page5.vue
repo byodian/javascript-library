@@ -7,7 +7,7 @@ export default {
   },
   watch: {
     $slides () {
-      console.log(this.$route.meta.title, this.$slides)
+      // console.log(this.$slides)
     }
   }
 }

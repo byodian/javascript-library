@@ -25,7 +25,7 @@ export default {
     }
   },
   created () {
-    console.log(this.$router.options.routes[0].children)
+    // console.log(this.$router.options.routes[0].children)
   }
 }
 </script>

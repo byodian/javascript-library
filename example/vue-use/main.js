@@ -6,6 +6,7 @@ window.Vue = Vue
 // 初始化 Vue.use 全局方法
 initUse(Vue);
 
+// 插件类型为 Object
 const pluginAsObject = {
   install(Vue, options = {}) {
     Vue.prototype.$sayHi = function () {
@@ -17,21 +18,20 @@ const pluginAsObject = {
   }
 };
 
-Vue.use(pluginAsObject, { name: "Vue!" });
-// Vue.use(pluginAsObject);
-
+// 插件类型为 Function
 const pluginAsFunc = function (Vue) {
   Vue.prototype.$sayBye = function () {
     console.log("Goodbye, take it easy!");
   };
 };
 
+Vue.use(pluginAsObject, { name: "Vue!" });
 Vue.use(pluginAsFunc);
-console.dir(Vue);
+// Vue.use(pluginAsObject);
 
 const vm = new Vue();
-
 vm.$sayHi();
+window.vm = vm
 
 /**
  * 返回一个元素节点
