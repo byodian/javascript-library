@@ -1,5 +1,31 @@
 # Vue plugin (vue2.x)
 
+Vue 插件本身内容很少，在官方文档中有提到插件地方我只发现了两处，一个在[插件介绍页](https://cn.vuejs.org/v2/guide/plugins.html)，另外一个在[全局 mixin 介绍页](https://cn.vuejs.org/v2/guide/mixins.html#%E5%85%A8%E5%B1%80%E6%B7%B7%E5%85%A5)：
+
+> 请谨慎使用全局混入，因为它会影响每个单独创建的 Vue 实例 (包括第三方组件)。大多数情况下，只应当应用于自定义选项，就像上面示例一样。推荐将其作为插件发布，以避免重复应用混入。
+
+内容少但不代表不重要，Vue 主要功能集中在[三个核心的模块](https://www.vuemastery.com/courses/vue3-deep-dive-with-evan-you/vue3-overview)，其他的功能如路由和全局状态交给相关的库并通过插件的形式引入。
+
+三个核心模块
+
+- 响应模块（Reactive Module）
+- 编译模块 (Compiler Module)
+- 渲染模块（Render Module）
+  - 渲染阶段（Render Phase）
+  - 挂载或者构建阶段（Mount or Create Phase）
+  - 补丁或者更新阶段（Patch or Update Phase）
+
+引入 vue-router 和 vuex
+
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import Vuex from 'vuex'
+
+Vue.use(VueRouter)
+Vue.use(Vuex)
+```
+
 ## 为什么要使用插件
 
 1. Vue.use 会自动阻止多次注册相同插件，即使多次调用也只会注册一次该插件。
@@ -71,9 +97,7 @@ new Vue({ /*...*/ })
 在 Vue 世界中有三种类型的插件：
 
 1. Vue 插件，为 Vue 提供全局层面的功能。
-
 2. Vuex 插件，为 Vuex 添加新的功能。
-
 3. Vue-CLI 插件，修改构建系统，为 Webpack 或 CLI Service 增加新的功能。
 
 ## Vue 插件
@@ -163,10 +187,18 @@ new Vue({
 根据以上内容我们提出下面三个问题：
 
 1. 为什么 Vue 插件既可以是对象也可以是函数？
-2. `Vue.use(plugin, options)` 参数 options 是如何传递给插件的第二个参数的
-3. 写一个插件需要什么
+
+2. `Vue.use(plugin, options)` options 是如何作用于插件可选项参数
 
 ## Vue.use 实现原理
+
+此方法定义在 vue/src/core/global-api/use.js 中，`use` 是 Vue 的一个[静态方法](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes/static)，此方法直接赋值给 Vue 构造器，与具体的类实例无关。
+
+执行 `Vue.use(plugin, options)`，会调用插件的 `install` 方法或者插件自身。
+
+- `Vue.use` 方法维护一个 `_installedPlugins` 数组来存储所有已注册的插件，调用插件之前判断该插件是否已被注册。
+- 然后根据插件的类型（对象或者函数），执行不同的代码。
+- 最后将已注册的插件保存在 `_installedPlugins` 数组中。
 
 ```js
 import { toArray } from '../util/index'
@@ -174,28 +206,22 @@ import { toArray } from '../util/index'
 function initUse (Vue) {
   // * Vue 构造器静态方法
   Vue.use = function (plugin) {
+    // Vue 静态属性 _installedPlugins - 存储插件
+    const installPlugins = this._installedPlugins || (this._installedPlugins = []);
     // this._installedPlugins = this._installedPlugins || []
     // const installPlugin = this._installedPlugins
-    const installPlugins = this._installedPlugins || (this._installedPlugins = []);
 
-    // * 确保插件只会被安装一次
+    // 插件已安装，直接返回 Vue 构造器
     if (installPlugins.indexOf(plugin) > -1) {
       return this;
     }
 
-    // * Vue.use(plugin, options)
+    // Vue.use(plugin, options)
     // arguments <Arguments> => [plugin, options]
-    // args <Array> => [options]
-    const args = toArray(arguments, 1);
-    console.log('arguments:', arguments);
-    console.log('args:', args);
+    const args = toArray(arguments, 1);   // args <Array> => [options]
+    args.unshift(this);                   // args <Array> => [Vue, options]
 
-    // * args <Array> => [Vue, options]
-    args.unshift(this);
-    console.log('执行 args.unshift(this) 之后, args:', args);
-
-    // * 1. plugin 作为对象且有 install 方法，调用 install 方法
-    // * 2. plugin 作为函数，直接调用该函数
+    // 判断插件类型，执行相应的函数
     if (typeof plugin.install === "function") {
       plugin.install.apply(plugin, args);
     } else if (typeof plugin === "function") {
@@ -208,6 +234,10 @@ function initUse (Vue) {
   };
 }
 ```
+
+## 写一个插件需要什么
+
+请谨慎使用全局混入，因为它会影响每个单独创建的 Vue 实例 (包括第三方组件)。大多数情况下，只应当应用于自定义选项，就像上面示例一样。推荐将其作为插件发布，以避免重复应用混入。
 
 ## Vue 3.0 插件的使用
 
